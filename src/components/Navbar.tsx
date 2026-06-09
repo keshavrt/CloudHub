@@ -68,7 +68,7 @@ export default function Navbar() {
       console.error("Logout request failed:", err);
     }
     setCurrentUser(null);
-    router.push("/auth");
+    window.location.href = "/auth";
   };
 
   return (
