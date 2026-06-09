@@ -4,7 +4,7 @@ import { verifyToken } from '@/lib/auth';
 
 // Define route protection arrays
 const PUBLIC_PATHS = ['/', '/auth'];
-const PUBLIC_API_PATHS = ['/api/auth/login', '/api/auth/register', '/api/auth/logout'];
+const PUBLIC_API_PATHS = ['/api/auth/login', '/api/auth/register', '/api/auth/logout', '/api/debug'];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
