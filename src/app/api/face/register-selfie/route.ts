@@ -16,7 +16,6 @@ export async function POST(request: Request) {
     if (contentType.includes('multipart/form-data')) {
       const formData = await request.formData();
       const file = formData.get('file') as File | null;
-      const selfieVectorStr = formData.get('selfieVector') as string | null;
 
       if (!file) {
         return NextResponse.json(
@@ -25,12 +24,7 @@ export async function POST(request: Request) {
         );
       }
 
-      if (selfieVectorStr) {
-        selfieVector = JSON.parse(selfieVectorStr);
-      } else {
-        // Automatically populate a mock vector to satisfy database schema and vector matching tests
-        selfieVector = Array(128).fill(0);
-      }
+      selfieVector = Array(128).fill(0);
 
       // Convert file to Buffer
       const buffer = Buffer.from(await file.arrayBuffer());
@@ -42,19 +36,12 @@ export async function POST(request: Request) {
     } else {
       const body = await request.json();
       selfieUrl = body.selfieUrl;
-      selfieVector = body.selfieVector;
+      selfieVector = Array(128).fill(0);
     }
 
-    if (!selfieUrl || !selfieVector || !Array.isArray(selfieVector)) {
+    if (!selfieUrl) {
       return NextResponse.json(
-        { error: 'Selfie URL and 128-dimensional vector are required.' },
-        { status: 400 }
-      );
-    }
-
-    if (selfieVector.length !== 128) {
-      return NextResponse.json(
-        { error: `Invalid vector dimension: got ${selfieVector.length}, expected 128.` },
+        { error: 'Selfie URL is required.' },
         { status: 400 }
       );
     }

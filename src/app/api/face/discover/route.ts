@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import db from '@/lib/db';
-import { findMatchingFaces } from '@/lib/faceDetector';
 
 export async function GET(request: Request) {
   try {
@@ -12,52 +11,25 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 1. Fetch user's reference selfie vector
+    // 1. Fetch user's reference selfie URL
     const user = await db.user.findUnique({
       where: { id: userId },
-      select: { selfieVector: true }
+      select: { selfieUrl: true }
     });
 
-    if (!user || !user.selfieVector || user.selfieVector.length === 0) {
+    if (!user || !user.selfieUrl) {
       return NextResponse.json({
         needsSelfie: true,
         message: 'Please upload a reference selfie first to discover photos of yourself.'
       });
     }
 
-    // 2. Fetch all FaceTags in the database that contain descriptors
-    // In production, we'd add paging, but for a fast, responsive demo, fetching tags is highly efficient.
-    const faceTags = await db.faceTag.findMany({
-      where: {
-        descriptor: { isEmpty: false }
-      },
-      select: {
-        id: true,
-        mediaId: true,
-        userId: true,
-        descriptor: true
-      }
-    });
-
-    if (faceTags.length === 0) {
-      return NextResponse.json({ media: [] });
-    }
-
-    // 3. Find matched media IDs (Euclidean approach fallback for E2E tests)
-    let matchedMediaIds: string[] = [];
-    if (user.selfieVector && user.selfieVector.length > 0) {
-      matchedMediaIds = findMatchingFaces(user.selfieVector, faceTags);
-    }
-
-    // 4. Also fetch matched media IDs directly from database relations (Gemini matches)
+    // 2. Fetch matched media IDs directly from database relations (Gemini AI matches)
     const directMatches = await db.faceTag.findMany({
       where: { userId: userId },
       select: { mediaId: true }
     });
-    const directMediaIds = directMatches.map((dm: any) => dm.mediaId);
-
-    // Merge both sets of IDs
-    const allMatchedIds = Array.from(new Set([...matchedMediaIds, ...directMediaIds]));
+    const allMatchedIds = directMatches.map((dm: any) => dm.mediaId);
 
     if (allMatchedIds.length === 0) {
       return NextResponse.json({ media: [] });

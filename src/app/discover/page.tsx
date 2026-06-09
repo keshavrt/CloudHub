@@ -40,6 +40,7 @@ export default function DiscoverTab() {
     item.faces.some((face) => 
       face.name.toLowerCase().includes("user") || 
       face.name.toLowerCase().includes("self") ||
+      (currentUser && face.userId === currentUser.id) ||
       (currentUser && face.name.toLowerCase() === currentUser.name.toLowerCase())
     )
   );

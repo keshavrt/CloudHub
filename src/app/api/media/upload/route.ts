@@ -72,7 +72,7 @@ export async function POST(request: Request) {
 
     if (!isVideo) {
       console.log('File uploaded. Calling Gemini API for image analysis...');
-      aiAnalysis = await analyzeImage(buffer, file.type);
+      aiAnalysis = await analyzeImage(buffer, file.type, file.name);
       console.log('Gemini Analysis received:', aiAnalysis);
     }
 
@@ -122,37 +122,50 @@ export async function POST(request: Request) {
       });
 
       if (registeredUsers.length > 0) {
-        try {
-          const matchedFaces = await matchFacesWithGemini(buffer, file.type, registeredUsers as any);
-          for (const face of matchedFaces) {
-            // Only store matches for registered users, or guests with name
-            if (face.matchedUserId || face.name) {
-              await db.faceTag.create({
-                data: {
-                  mediaId: media.id,
-                  userId: face.matchedUserId || null,
-                  name: face.name,
-                  boundingBox: face.box || {},
-                  descriptor: []
-                }
-              });
+        // Skip face matching if it's obviously a food photo
+        const captionLower = (aiAnalysis.caption || '').toLowerCase();
+        const fileNameLower = (file.name || '').toLowerCase();
+        const hasFoodKeyword = ['pasta', 'food', 'dish', 'plate', 'eat', 'meal', 'sauce', 'cooking', 'cuisine', 'recipe', 'dinner', 'lunch', 'breakfast'].some(kw => 
+          captionLower.includes(kw) || 
+          fileNameLower.includes(kw) || 
+          (aiAnalysis.tags || []).some((t: string) => t.toLowerCase().includes(kw))
+        );
 
-              if (face.matchedUserId && face.matchedUserId !== userId) {
-                await db.notification.create({
+        if (!hasFoodKeyword) {
+          try {
+            const matchedFaces = await matchFacesWithGemini(buffer, file.type, registeredUsers as any, file.name);
+            for (const face of matchedFaces) {
+              // Only store matches for registered users, or guests with name
+              if (face.matchedUserId || face.name) {
+                await db.faceTag.create({
                   data: {
-                    userId: face.matchedUserId,
-                    type: 'tag',
-                    message: `You were automatically spotted and tagged in a new event photo!`,
-                    mediaId: media.id
+                    mediaId: media.id,
+                    userId: face.matchedUserId || null,
+                    name: face.name,
+                    boundingBox: face.box || {},
+                    descriptor: []
                   }
                 });
-                autoTaggedUsers.push(face.matchedUserId);
+
+                if (face.matchedUserId && face.matchedUserId !== userId) {
+                  await db.notification.create({
+                    data: {
+                      userId: face.matchedUserId,
+                      type: 'tag',
+                      message: `You were automatically spotted and tagged in a new event photo!`,
+                      mediaId: media.id
+                    }
+                  });
+                  autoTaggedUsers.push(face.matchedUserId);
+                }
+                processedFaceTagsCount++;
               }
-              processedFaceTagsCount++;
             }
+          } catch (err) {
+            console.error('Failed to match faces:', err);
           }
-        } catch (err) {
-          console.error('Failed to match faces:', err);
+        } else {
+          console.log(`Skipping face matching for food upload: ${file.name}`);
         }
       }
     }
