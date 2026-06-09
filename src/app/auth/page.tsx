@@ -11,9 +11,9 @@ export default function AuthPage() {
   const { setCurrentUser } = useAppState();
   
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("photographer@eventmanager.com");
-  const [password, setPassword] = useState("PhotoPassword123");
-  const [name, setName] = useState("Alex Rivera");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
