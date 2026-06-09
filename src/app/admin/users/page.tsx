@@ -88,7 +88,7 @@ export default function UserManagementPage() {
     setSaving(userId);
     setFeedback(null);
     try {
-      const res = await fetch(`/api/users/${userId}/role`, {
+      const res = await fetch(`/api/users/${userId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

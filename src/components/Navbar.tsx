@@ -57,8 +57,9 @@ export default function Navbar() {
     { name: "Dashboard", href: "/dashboard" },
     { name: "Events", href: "/events" },
     ...(currentUser ? [{ name: "My Photos", href: "/my-photos" }] : []),
-    { name: "Profile", href: "/profile" }
-  ];
+    { name: "Profile", href: "/profile" },
+    ...(currentUser?.role === "Admin" ? [{ name: "User Management", href: "/admin/users", adminOnly: true }] : []),
+  ] as { name: string; href: string; adminOnly?: boolean }[];
 
   const handleLogout = async () => {
     try {
@@ -94,12 +95,17 @@ export default function Navbar() {
               <LinkComponent
                 key={link.name}
                 href={link.href}
-                className={`relative px-3 py-2 text-sm font-medium transition-colors hover:text-zinc-950 dark:hover:text-white ${
+                className={`relative flex items-center gap-1.5 px-3 py-2 text-sm font-medium transition-colors hover:text-zinc-950 dark:hover:text-white ${
                   isActive 
                     ? "text-purple-500 dark:text-purple-400" 
                     : "text-zinc-500 dark:text-zinc-400"
                 }`}
               >
+                {link.adminOnly && (
+                  <span className="flex items-center justify-center h-4 w-4 rounded-full bg-red-500/15 text-red-500">
+                    <Shield size={9} />
+                  </span>
+                )}
                 {link.name}
                 {isActive && (
                   <motion.div
@@ -300,12 +306,19 @@ export default function Navbar() {
                   key={link.name}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                  className={`flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
                     pathname === link.href
                       ? "bg-purple-500/10 dark:bg-purple-950/20 text-purple-650 dark:text-purple-400"
+                      : link.adminOnly
+                      ? "text-red-500 dark:text-red-400 hover:bg-red-500/10 dark:hover:bg-red-500/10"
                       : "text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-950 dark:hover:text-white"
                   }`}
                 >
+                  {link.adminOnly && (
+                    <span className="flex items-center justify-center h-4 w-4 rounded-full bg-red-500/15 text-red-500">
+                      <Shield size={9} />
+                    </span>
+                  )}
                   {link.name}
                 </LinkComponent>
               ))}

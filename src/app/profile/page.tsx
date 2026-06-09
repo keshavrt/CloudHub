@@ -449,24 +449,6 @@ export default function ProfilePage() {
             </form>
           </div>
 
-          {/* ── Admin Panel Link (Admin only) ─────────────────────────────── */}
-          {currentUser.role === "Admin" && (
-            <Link
-              href="/admin/users"
-              className="group flex items-center justify-between rounded-3xl border border-indigo-200 dark:border-indigo-500/20 bg-indigo-50 dark:bg-indigo-500/5 px-6 py-4 hover:bg-indigo-100 dark:hover:bg-indigo-500/10 transition-colors shadow-sm"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 text-white shadow">
-                  <ShieldCheck size={16} />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-indigo-700 dark:text-indigo-300">User Management</p>
-                  <p className="text-xs text-indigo-500 dark:text-indigo-400">Promote, demote, and manage all registered users.</p>
-                </div>
-              </div>
-              <ExternalLink size={16} className="text-indigo-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors shrink-0" />
-            </Link>
-          )}
 
         </div>
 
