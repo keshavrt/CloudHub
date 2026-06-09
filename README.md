@@ -11,8 +11,11 @@
 [![Supabase](https://img.shields.io/badge/Supabase-Storage-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com)
 [![Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://deepmind.google/gemini)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-cloud--hub--kvyk.vercel.app-00C7B7?style=for-the-badge&logo=vercel&logoColor=white)](https://cloud-hub-kvyk.vercel.app)
 
 **CloudHub** is a production-grade, AI-first media management platform built for event organizers and photographers. It combines real-time cloud storage, multi-modal AI analysis, client-side facial recognition, and a role-based permission engine — all in a single cohesive platform.
+
+🌐 **[View Live Demo →](https://cloud-hub-kvyk.vercel.app)**
 
 </div>
 
